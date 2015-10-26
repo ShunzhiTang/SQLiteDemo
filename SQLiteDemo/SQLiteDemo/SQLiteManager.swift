@@ -23,7 +23,7 @@ class SQLiteManager {
         
         //生成数据库完整的路径 , 获取沙盒 document的路径
         let path = (NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask , true).last! as NSString).stringByAppendingPathComponent(dbName)
-        print(path + "沙盒下的路径")
+        print("沙盒下的路径:" + path)
         
         /**
         * 参数：
@@ -60,18 +60,37 @@ class SQLiteManager {
         "'height' REAL,\n" +
         "'title' TEXT \n"  +
         ");"
-        
-        print(sql)
-        
         //执行sql
         return execSQL(sql)
     }
     
     //MARK: 执行Sql ，创建表
     func execSQL(sql: String) -> Bool {
+        /**
+        参数：
+        1、db全局句柄
+        2、要执行的sql
+        3、callBack执行sql完毕回调的函数，通常是nil
+        4、第四个参数回调函数的第一个参数的地址 ，通常也是nil
+        5、错误信息字符串的地址 ，一般也不需要
         
+        */
         return (sqlite3_exec(db, sql, nil, nil, nil) == SQLITE_OK)
     }
     
+    
+    //MARK: 插入表数据
+    
+    func execInsert(sql: String) -> Int {
+        
+        //执行sql语句
+        if sqlite3_exec(db, sql, nil, nil, nil) == SQLITE_OK{
+            
+            //返回自增长的id
+            return Int(sqlite3_last_insert_rowid(db))
+        }
+        
+        return -1
+    }
     
 }

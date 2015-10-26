@@ -15,7 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        //在程序初始化的时间打开表
+        SQLiteManager.shareManager.openDB("student_Info.db")
+        
         return true
     }
 

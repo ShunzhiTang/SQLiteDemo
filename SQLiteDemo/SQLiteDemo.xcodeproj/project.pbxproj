@@ -14,6 +14,7 @@
 		2473020B1BDDC01A0083189B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 247302091BDDC01A0083189B /* LaunchScreen.storyboard */; };
 		247302131BDDC1890083189B /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 247302121BDDC1890083189B /* libsqlite3.tbd */; };
 		2473021C1BDDC4A30083189B /* SQLiteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2473021B1BDDC4A30083189B /* SQLiteManager.swift */; settings = {ASSET_TAGS = (); }; };
+		24B8E56C1BDE8BB800A11135 /* Student.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B8E56B1BDE8BB800A11135 /* Student.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		247302121BDDC1890083189B /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		247302151BDDC1DD0083189B /* SQLite-Bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SQLite-Bridge.h"; sourceTree = "<group>"; };
 		2473021B1BDDC4A30083189B /* SQLiteManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteManager.swift; sourceTree = "<group>"; };
+		24B8E56B1BDE8BB800A11135 /* Student.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Student.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 				247302151BDDC1DD0083189B /* SQLite-Bridge.h */,
 				247302001BDDC01A0083189B /* AppDelegate.swift */,
 				247302021BDDC01A0083189B /* ViewController.swift */,
+				24B8E56B1BDE8BB800A11135 /* Student.swift */,
 				2473021B1BDDC4A30083189B /* SQLiteManager.swift */,
 				247302041BDDC01A0083189B /* Main.storyboard */,
 				247302071BDDC01A0083189B /* Assets.xcassets */,
@@ -146,6 +149,7 @@
 				2473021C1BDDC4A30083189B /* SQLiteManager.swift in Sources */,
 				247302031BDDC01A0083189B /* ViewController.swift in Sources */,
 				247302011BDDC01A0083189B /* AppDelegate.swift in Sources */,
+				24B8E56C1BDE8BB800A11135 /* Student.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,6 +301,7 @@
 				247302111BDDC01A0083189B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
