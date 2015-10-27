@@ -12,11 +12,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
        //数据库的 测试
-        insertData()
+//        insertData()
 //        updateData()
 //        deleteData()
         
+       let result =  Student.students()
         
+        print(result)
     }
     
     // 插入数据

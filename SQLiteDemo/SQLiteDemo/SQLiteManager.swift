@@ -93,4 +93,98 @@ class SQLiteManager {
         return -1
     }
     
+    //MARK: 执行sql语句返回的结果集
+    
+    
+    func execRecordSet(sql: String) -> [[String : AnyObject]]?{
+        // 1. 准备 SQL，预先编译 SQL
+        /**
+        参数
+        1. db 数据库句柄
+        2. sql 执行的 sql
+        3. sql 语句字节的长度，但是 -1 能够自动计算
+        4. stmt 语句的指针，后续的查询操作，全部依赖这个指针
+        相当于编译好的 sql
+        需要`释放`
+        5. 尾部参数，通常设置为 nil
+        */
+        
+        //定义一个指针
+        var stmt: COpaquePointer = nil
+        //预编译sql
+        if sqlite3_prepare_v2(db , sql, -1, &stmt, nil) != SQLITE_OK{
+            print("SQL 语句有错误！")
+            return nil
+        }
+        
+        print("SQL正确")
+        
+        //定义一个字典数组 ，存储查询的结果的集合
+        var recordSet = [[String : AnyObject]]()
+        
+        // sqlite3_step `单步`执行sql 每调用一次，就获得一个结果
+        // SQLITE_ROW 表示获得一条row记录
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            //添加到数组
+                recordSet.append(recordDict(stmt))
+            }
+        //释放语句
+
+        sqlite3_finalize(stmt)
+    
+        //返回结果数组
+        return  recordSet
+    }
+    
+    //MARK: 从stmt 语句提取单条记录的字典
+    private func recordDict(stmt: COpaquePointer) -> [String : AnyObject] {
+        
+        /**
+        * 再继续操作就是针对`行` 一条记录，每条记录应该有多个字段
+        */
+        
+        //1、每一行有多少个 '字段' cols ,获得列数
+        let  colCount = sqlite3_column_count(stmt)
+        
+        //一个字典记录单条数据记录
+        var dict = [String : AnyObject]()
+        
+        
+        //2、知道每一列字段的名字和内容
+        for col in 0..<colCount {
+            
+            //获取 每一个字段名
+            
+            let cName = sqlite3_column_name(stmt, col)
+            //cName 是一种c语言的字符，需要去转换 uint8 ccChar
+            let name = String(CString: cName, encoding: NSUTF8StringEncoding)
+            
+            //获取每一列的数据类型
+            let type = sqlite3_column_type(stmt, col)
+            
+            //根据不同的类型 去获取不同的值
+            
+            //定义全局变量记录不同类型的值
+            var value: AnyObject?
+            switch type {
+            case SQLITE_INTEGER:
+                value =  Int(sqlite3_column_int64(stmt, col))
+            case SQLITE_FLOAT:
+                value = sqlite3_column_double(stmt, col)
+                
+            case SQLITE3_TEXT:
+                //转换格式
+                let cValue = UnsafePointer<Int8>(sqlite3_column_text(stmt, col))
+                value = String(CString: cValue, encoding: NSUTF8StringEncoding)
+            case SQLITE_NULL:
+                value = NSNull()
+            default:
+                print("不支持的数据类型！！！")
+            }
+            
+            //给我们字典 赋值
+            dict[name!] = value ?? NSNull()
+    }
+    return dict
+  }
 }

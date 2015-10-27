@@ -48,7 +48,6 @@ class Student: NSObject {
         
         return SQLiteManager.shareManager.execSQL(sql)
     }
-    
     // MARK: 更新表的一条记录
     func updateStudent() ->Bool {
         assert(name != nil, "姓名不能为空")
@@ -58,5 +57,22 @@ class Student: NSObject {
         
         return SQLiteManager.shareManager.execSQL(sql)
         
+    }
+    //MARK: 查询20条数据
+    
+    class func students() ->[Student]? {
+        //sql 查询语句
+        let sql = "select * from T_Student LIMIT 10;"
+        
+        //执行 进行判断
+        guard let array = SQLiteManager.shareManager.execRecordSet(sql) else {
+            return nil
+        }
+        //遍历数组，字典转模型
+        var arrayM = [Student]()
+        for dict in array {
+            arrayM.append(Student(dict: dict))
+        }
+        return arrayM
     }
 }
