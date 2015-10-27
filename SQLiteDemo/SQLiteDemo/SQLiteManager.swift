@@ -18,6 +18,10 @@ class SQLiteManager {
     
     private var db: COpaquePointer = nil
     
+    //数据库操作串行队列，使用多线程去执行
+    private let queue = dispatch_queue_create("tszSqlite", DISPATCH_QUEUE_SERIAL)
+    
+    
     //MARK: 打开数据库
     func openDB(dbName: String) {
         
@@ -47,8 +51,86 @@ class SQLiteManager {
         }
     }
     
-    //MARK: 创建数据表
+    //MARK: 多线程队列更新数据,把自己的行为传递过去
+    func queueUpdate(action: (manager: SQLiteManager) ->()){
+        
+        dispatch_async(queue) { () -> Void in
+            //1、开启事务
+            self.beginTransaction()
+            
+            //2、执行任务
+            action(manager: self)
+            
+            //3、提交事务
+            self.commitTransaction()
+        }
+    }
     
+    //MARK: 开启事务
+    func beginTransaction() {
+        execSQL("BEGIN TRANSACTION;")
+    }
+    
+    //MARK: 事务的回滚
+    func rollbackTransaction() {
+        execSQL("ROLLBACK TRANSACTION;")
+    }
+    //MARK: 提交事务
+    func commitTransaction() {
+        execSQL("COMMIT TRANSACTION")
+    }
+    
+    //MARK: 预编译
+    // CVarArgType ，多个参数
+    func prepareUpdate(sql: String , args: CVarArgType...) -> Bool{
+        
+        //1、准备sql
+        var stmt: COpaquePointer = nil
+        
+        if sqlite3_prepare_v2(db, sql, -1,&stmt, nil) != SQLITE_OK {
+            print("SQL错误")
+            return false
+        }
+        
+        //2、遍历绑定数据，从1开始
+        var index: Int32 = 1
+        for value in args {
+            
+            //根据不同的类型去绑定
+            if value is Int {
+                sqlite3_bind_int64(stmt,index, sqlite3_int64(value as! Int))
+            }else if value is Double {
+                sqlite3_bind_double(stmt, index, value as! Double)
+            }else if  value is String {
+                sqlite3_bind_text(stmt, index, value as! String , -1 , SQLITE_TEXT_TYPE)
+            }else if value is NSNull {
+                sqlite3_bind_null(stmt, index)
+            }
+             index++
+        }
+       
+        //3、执行sql单步
+        var result = true
+        if sqlite3_step(stmt) != SQLITE_DONE {
+            result = false
+            print("更新数据失败")
+        }
+        //4、为了保证 可以复用需要复位
+        if sqlite3_reset(stmt) != SQLITE_OK{
+            result = false
+            print("SQL重置失败")
+        }
+        //5、释放stmt
+        sqlite3_finalize(stmt)
+        
+        return result
+    }
+    
+    //MARK: text类型的定义
+    private let SQLITE_TEXT_TYPE = unsafeBitCast(-1, sqlite3_destructor_type.self)
+    
+    
+    //MARK: 创建数据表
     private func createTable() ->Bool {
         
         //创建表的sql 语句
@@ -142,6 +224,7 @@ class SQLiteManager {
         /**
         * 再继续操作就是针对`行` 一条记录，每条记录应该有多个字段
         */
+        
         
         //1、每一行有多少个 '字段' cols ,获得列数
         let  colCount = sqlite3_column_count(stmt)

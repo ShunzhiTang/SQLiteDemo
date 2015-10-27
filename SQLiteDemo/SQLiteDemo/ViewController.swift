@@ -16,42 +16,43 @@ class ViewController: UIViewController {
 //        updateData()
 //        deleteData()
         
-       let result =  Student.students()
+//       let result =  Student.students()
         
-        print(result)
+//        print(result)
+        insertData()
+        
     }
     
-    // 插入数据
-    var flag: Bool = false
     /// 测试插入10000条数据需要 54.89秒 ，那么当操作大批量的数据的时间要用到事务，默认不开启事务
     //开启事务的是 0.8秒
     
-    //swift中两种获取当前系统时间的方法
-    var time1  = NSDate.timeIntervalSinceReferenceDate()
-    var time = CFAbsoluteTimeGetCurrent()
+    
     
     func insertData(){
-        //开启事务：
-        SQLiteManager.shareManager.execSQL("BEGIN TRANSACTION")
-
+        
+        var flag:Bool = false
+        
+        //swift中两种获取当前系统时间的方法
+//        var time1  = NSDate.timeIntervalSinceReferenceDate()
+        var time = CFAbsoluteTimeGetCurrent()
+  
+        let sql = "insert into T_Student(name , age, height,title)\n" + "VALUES(? ,?,?,?);"
+           //开启事务：
+        SQLiteManager.shareManager.beginTransaction()
         for i in 0..<20 {
-            let dict = ["name": "zhangsan" , "age" : 19+i ,"height": 180.2 , "title" : "好好学习"]
-            let stu =  Student(dict: dict as! [String :AnyObject])
-            //执行插入数据的动作
-           flag  = stu.insertStudent()
-            
+           
+           flag =  SQLiteManager.shareManager.prepareUpdate(sql, args: "lisi\(i)" ,29 + i,1.8,"xuexi")
         }
-        //提交事务
-        SQLiteManager.shareManager.execSQL("COMMIT TRANSACTION")
         
+        //提交事
+        SQLiteManager.shareManager.commitTransaction()
         time = CFAbsoluteTimeGetCurrent() - time
-         time1 = NSDate.timeIntervalSinceReferenceDate() - time1
-        print("时间差：\(time)  + NSDate\(time1)")
-        
-        if flag {
-            print("插入数据成功")
-        }else {
-            print("插入数据失败")
+
+        print("时间差：\(time)")
+        if flag{
+            print("插入成功")
+        } else {
+            print("插入失败")
         }
     }
     
@@ -83,7 +84,7 @@ class ViewController: UIViewController {
             print("update success")
         }
     }
-    
+
     
 }
 
